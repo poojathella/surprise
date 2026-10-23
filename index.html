@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Happy Birthday Bakkss 💗</title>
+  <meta name="theme-color" content="#ffd6ea">
+
+  <!-- Cute fonts (free). If they can't load, the site falls back to rounded system fonts. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Quicksand:wght@500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background layers (floating hearts, stars, butterflies, confetti, balloons) -->
+  <div id="bg" aria-hidden="true"></div>
+  <div id="balloons" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <!-- 🎵 THE SONG
+       Put your own song in the assets/ folder and name it  birthday-song.mp3
+       (see README.md). The browser tries these files in order and uses the first one it finds.
+       The audio tag lives OUTSIDE the scenes so the song never restarts when scenes change. -->
+  <audio id="song" loop preload="auto">
+    <source src="assets/birthday-song.mp3" type="audio/mpeg">
+    <source src="assets/birthday-song.m4a" type="audio/mp4">
+    <source src="assets/birthday-song.ogg" type="audio/ogg">
+    <source src="assets/birthday-song.wav" type="audio/wav">
+  </audio>
+
+  <!-- Music player (always visible) -->
+  <div class="player" id="player">
+    <button id="btnPlay" class="pbtn" type="button" aria-label="Play birthday song">▶</button>
+    <span class="plabel" id="plabel">🎵 Birthday song</span>
+    <button id="btnMute" class="pbtn" type="button" aria-label="Mute">🔊</button>
+    <input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume">
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p style="padding:2rem;text-align:center">Please turn on JavaScript to open your surprise 💗</p></noscript>
+
+  <main id="stage">
+
+    <!-- ============ 1. WELCOME ============ -->
+    <section class="scene active" id="scene-welcome" aria-label="Welcome">
+      <div class="scene-inner">
+        <h1 class="title">Happy Birthday&nbsp; <span class="name">Bakkss!</span> 🎂💗</h1>
+        <p class="subtitle">A little surprise, made just for you ✨</p>
+        <div class="duo">
+          <div class="char girl pose-wave" data-char="girl"></div>
+          <div class="char boy pose-wave" data-char="boy"></div>
+        </div>
+        <button class="btn glow" id="btnOpen" type="button">Open Your Surprise 🎁</button>
+      </div>
+    </section>
+
+    <!-- ============ 2. CAKE ============ -->
+    <section class="scene" id="scene-cake" aria-label="Birthday cake">
+      <div class="scene-inner">
+        <h2 class="title small" id="wishTitle">Make a wish Bngrm! ✨</h2>
+        <p class="hint" id="candleHint">Tap the candles to blow them out 🕯️💨 <span id="candleCount"></span></p>
+
+        <div class="cake-row">
+          <div class="char girl side pose-wave" data-char="girl"></div>
+
+          <div class="cake-wrap" id="cakeWrap">
+            <svg id="cakeSvg" viewBox="0 0 320 280" role="img" aria-label="A birthday cake with candles">
+              <defs>
+                <clipPath id="clipLeft"><rect x="0" y="0" width="205" height="280"/></clipPath>
+                <clipPath id="clipRight"><rect x="205" y="0" width="115" height="280"/></clipPath>
+                <linearGradient id="gPink" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ffc9e0"/><stop offset="1" stop-color="#ff9fc6"/>
+                </linearGradient>
+                <linearGradient id="gLav" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#e6d8ff"/><stop offset="1" stop-color="#c4a9ff"/>
+                </linearGradient>
+                <radialGradient id="gGlow">
+                  <stop offset="0" stop-color="#fff6a8" stop-opacity=".95"/>
+                  <stop offset="1" stop-color="#ffd27a" stop-opacity="0"/>
+                </radialGradient>
+
+                <!-- The whole cake is drawn once and used twice (left part + slice) so it can be cut -->
+                <g id="cakeBody">
+                  <rect x="40" y="156" width="240" height="78" rx="20" fill="url(#gPink)"/>
+                  <rect x="40" y="192" width="240" height="9" fill="#fff6ea"/>
+                  <path id="dripBottom" fill="#ffffff"/>
+                  <rect x="72" y="106" width="176" height="60" rx="18" fill="url(#gLav)"/>
+                  <rect x="72" y="136" width="176" height="8" fill="#fff6ea"/>
+                  <ellipse cx="160" cy="106" rx="88" ry="10" fill="#ffffff"/>
+                  <path id="dripTop" fill="#ffffff"/>
+                  <!-- sprinkles -->
+                  <g id="sprinkles"></g>
+                  <!-- cherry -->
+                  <path d="M228 98 Q232 84 240 80" stroke="#5aa86a" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  <circle cx="228" cy="100" r="9" fill="#ff4f86"/>
+                  <circle cx="225" cy="97" r="2.6" fill="#fff" opacity=".8"/>
+                </g>
+              </defs>
+
+              <!-- plate -->
+              <ellipse cx="160" cy="240" rx="146" ry="22" fill="#b79cff" opacity=".18"/>
+              <ellipse cx="160" cy="236" rx="140" ry="20" fill="#ffffff"/>
+              <ellipse cx="160" cy="234" rx="118" ry="13" fill="#f3e8ff"/>
+
+              <!-- the soft sponge you see inside once the cake is cut -->
+              <rect x="203" y="110" width="34" height="62" fill="#fff0d9"/>
+              <rect x="203" y="168" width="34" height="66" fill="#ffe3ee"/>
+              <rect x="203" y="136" width="34" height="8" fill="#ffffff"/>
+              <g clip-path="url(#clipLeft)"><use href="#cakeBody"/></g>
+              <g id="slice"><g clip-path="url(#clipRight)"><use href="#cakeBody"/></g></g>
+
+              <g id="candles"></g>
+
+              <g id="knife">
+                <rect x="202" y="100" width="6" height="136" rx="3" fill="#eef3fb" stroke="#b7c3d9"/>
+                <rect x="197" y="62" width="16" height="42" rx="8" fill="#ff8fc0"/>
+              </g>
+            </svg>
+          </div>
+
+          <div class="char boy side pose-wave" data-char="boy"></div>
+        </div>
+
+        <div class="msg-zone">
+          <p class="big" id="wishDone" hidden>Yayyy! Your wish is ready! 💗</p>
+          <p class="big" id="cutMsg" hidden>Yayyy, happy birthday bakkss! Let's celebrate! 🎉💗</p>
+          <button class="btn ghost" id="btnSongPrompt" type="button" hidden>🎵 Tap to play the birthday song</button>
+          <button class="btn glow" id="btnCut" type="button" hidden>Now Let's Cut the Cake! 🎂</button>
+          <button class="btn glow" id="btnToParty" type="button" hidden>Start the Party! 🎈</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. CELEBRATION ============ -->
+    <section class="scene" id="scene-party" aria-label="Birthday celebration">
+      <div class="scene-inner">
+        <h2 class="title small">It's party time! 🎉</h2>
+        <div class="party-row">
+          <div class="char girl pose-jump" data-char="girl"></div>
+          <div class="gift" id="gift" aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <ellipse cx="50" cy="95" rx="34" ry="4.5" fill="#b79cff" opacity=".25"/>
+              <rect x="14" y="46" width="72" height="46" rx="8" fill="#ff9fc6"/>
+              <g class="gift-lid">
+                <rect x="8" y="32" width="84" height="18" rx="8" fill="#c4a9ff"/>
+                <ellipse cx="38" cy="25" rx="13" ry="9" fill="#ffe27a" transform="rotate(-20 38 25)"/>
+                <ellipse cx="62" cy="25" rx="13" ry="9" fill="#ffe27a" transform="rotate(20 62 25)"/>
+                <circle cx="50" cy="29" r="6" fill="#ffc83d"/>
+                <rect x="44" y="32" width="12" height="18" fill="#ffe27a"/>
+              </g>
+              <rect x="44" y="50" width="12" height="42" fill="#ffe27a"/>
+            </svg>
+          </div>
+          <div class="char boy pose-jump" data-char="boy"></div>
+        </div>
+        <p class="hint">Tap anywhere for little surprises ✨</p>
+        <div class="btn-row">
+          <button class="btn glow" id="btnMore" type="button">Celebrate More! 🎉</button>
+          <button class="btn ghost" id="btnToMessage" type="button">Continue 💗</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. PERSONAL MESSAGE ============ -->
+    <section class="scene" id="scene-message" aria-label="Personal message">
+      <div class="scene-inner">
+        <div class="letter-card" id="msgCard">
+          <div class="deco-layer" id="msgDeco"></div>
+          <p class="letter-text typing" id="msgText"></p>
+        </div>
+        <button class="btn glow" id="btnToSecret" type="button" hidden>One Last Surprise? 💌</button>
+      </div>
+    </section>
+
+    <!-- ============ 5. SECRET MESSAGE ============ -->
+    <section class="scene" id="scene-secret" aria-label="Secret message">
+      <div class="dim" id="dim"></div>
+      <div class="scene-inner">
+
+        <div class="env-stage" id="envStage">
+          <p class="title small">Waittt, bakkss! There's one last thing for u... 💌</p>
+          <div class="envelope" id="envelope" aria-hidden="true">
+            <div class="env-back"></div>
+            <div class="env-paper"></div>
+            <div class="env-front"></div>
+            <div class="env-flap"></div>
+            <div class="env-seal">💗</div>
+          </div>
+          <button class="btn glow" id="btnOpenSecret" type="button">Open Your Secret Message 💗</button>
+        </div>
+
+        <div class="letter-stage" id="letterStage" hidden>
+          <div class="letter-card big" id="secretCard">
+            <div class="deco-layer" id="secretDeco"></div>
+            <div class="letter-scroll" id="secretScroll">
+              <p class="letter-text typing" id="secretText"></p>
+              <div class="letter-sign" id="secretSign" hidden>
+                <p>Made with lots of love, just for u! 💗</p>
+                <p class="script">Forever ur bakkss 🫂🎀</p>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn ghost tiny" id="btnSkipType" type="button">Show it all ⏩</button>
+            <button class="btn glow" id="btnToHug" type="button" hidden>Send the Hug 🫂</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ 6. FINAL HUG ============ -->
+    <section class="scene" id="scene-hug" aria-label="The final hug">
+      <div class="scene-inner">
+        <div class="hug-stage" id="hugStage">
+          <div class="char girl hug-girl" data-char="girl"></div>
+          <div class="char boy hug-boy" data-char="boy"></div>
+          <div class="hug-hearts" id="hugHearts" aria-hidden="true"></div>
+        </div>
+
+        <div class="hug-msg"><p id="hugLine" class="hug-line"></p></div>
+
+        <div class="hug-final" id="hugFinal" hidden>
+          <h2 class="title small">Happy Birthday, My Bngrm! 🎂💗</h2>
+          <p class="final-sub">Made with endless love, just for u. 🦋</p>
+          <button class="btn glow" id="btnReplay" type="button">Relive Your Birthday Surprise 🎁</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
